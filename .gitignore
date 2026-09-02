@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Environment files
+.env
+.env.local
+*.env
+
+# Node-RED
+backend/nodered/.node-red/flows_cred.json
+backend/nodered/.node-red/.config.*.json
+backend/nodered/.node-red/lib/flows/*
+
+# Build output
+dist/
+build/
+.vite/
+
+# OS / editor
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+
+# Logs
+*.log
+npm-debug.log*

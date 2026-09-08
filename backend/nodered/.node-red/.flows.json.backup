@@ -1,0 +1,234 @@
+[
+    {
+        "id": "auth-tab",
+        "type": "tab",
+        "label": "Auth",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "signup-in",
+        "type": "http in",
+        "z": "auth-tab",
+        "name": "POST /auth/signup",
+        "url": "/auth/signup",
+        "method": "post",
+        "upload": false,
+        "x": 100,
+        "y": 100,
+        "wires": [
+            [
+                "signup-validate"
+            ]
+        ]
+    },
+    {
+        "id": "signup-validate",
+        "type": "function",
+        "z": "auth-tab",
+        "name": "Validate Input",
+        "func": "const { email, password } = msg.payload;\n\nif (!email || !password) {\n  msg.statusCode = 400;\n  msg.payload = { error: \"Email and password required\" };\n  return [null, msg];\n}\n\nif (password.length < 8) {\n  msg.statusCode = 400;\n  msg.payload = { error: \"Password must be at least 8 characters\" };\n  return [null, msg];\n}\n\nreturn [msg, null];",
+        "outputs": 2,
+        "noerr": 0,
+        "x": 250,
+        "y": 100,
+        "wires": [
+            [
+                "signup-hash"
+            ],
+            [
+                "signup-error"
+            ]
+        ],
+        "outputLabels": [
+            "valid",
+            "error"
+        ]
+    },
+    {
+        "id": "signup-hash",
+        "type": "function",
+        "z": "auth-tab",
+        "name": "Hash Password",
+        "func": "const bcryptjs = global.get(\"bcryptjs\");\nconst salt = bcryptjs.genSaltSync(10);\nmsg.payload.passwordHash = bcryptjs.hashSync(msg.payload.password, salt);\ndelete msg.payload.password;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 400,
+        "y": 100,
+        "wires": [
+            [
+                "signup-db"
+            ]
+        ]
+    },
+    {
+        "id": "signup-db",
+        "type": "function",
+        "z": "auth-tab",
+        "name": "Insert User (Mock)",
+        "func": "msg.payload.id = Math.random().toString(36).substr(2, 9);\nmsg.payload.createdAt = new Date().toISOString();\nmsg.user = { id: msg.payload.id, email: msg.payload.email };\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 550,
+        "y": 100,
+        "wires": [
+            [
+                "signup-jwt"
+            ]
+        ]
+    },
+    {
+        "id": "signup-jwt",
+        "type": "function",
+        "z": "auth-tab",
+        "name": "Generate JWT",
+        "func": "const jwt = global.get(\"jwt\");\nconst secret = process.env.JWT_SECRET || \"test-secret-key\";\nconst refreshSecret = process.env.JWT_REFRESH_SECRET || \"test-refresh-key\";\n\nconst accessToken = jwt.sign(\n  { id: msg.user.id, email: msg.user.email },\n  secret,\n  { expiresIn: \"1h\" }\n);\n\nconst refreshToken = jwt.sign(\n  { id: msg.user.id },\n  refreshSecret,\n  { expiresIn: \"7d\" }\n);\n\nmsg.statusCode = 201;\nmsg.payload = {\n  user: msg.user,\n  accessToken: accessToken,\n  refreshToken: refreshToken\n};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 700,
+        "y": 100,
+        "wires": [
+            [
+                "signup-resp"
+            ]
+        ]
+    },
+    {
+        "id": "signup-resp",
+        "type": "http response",
+        "z": "auth-tab",
+        "name": "Response",
+        "statusCode": "201",
+        "headers": {},
+        "x": 850,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "signup-error",
+        "type": "http response",
+        "z": "auth-tab",
+        "name": "Error Response",
+        "statusCode": "400",
+        "headers": {},
+        "x": 400,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "login-in",
+        "type": "http in",
+        "z": "auth-tab",
+        "name": "POST /auth/login",
+        "url": "/auth/login",
+        "method": "post",
+        "upload": false,
+        "x": 100,
+        "y": 300,
+        "wires": [
+            [
+                "login-validate"
+            ]
+        ]
+    },
+    {
+        "id": "login-validate",
+        "type": "function",
+        "z": "auth-tab",
+        "name": "Validate Input",
+        "func": "const { email, password } = msg.payload;\n\nif (!email || !password) {\n  msg.statusCode = 400;\n  msg.payload = { error: \"Email and password required\" };\n  return [null, msg];\n}\n\nreturn [msg, null];",
+        "outputs": 2,
+        "noerr": 0,
+        "x": 250,
+        "y": 300,
+        "wires": [
+            [
+                "login-fetch"
+            ],
+            [
+                "login-error"
+            ]
+        ],
+        "outputLabels": [
+            "valid",
+            "error"
+        ]
+    },
+    {
+        "id": "login-fetch",
+        "type": "function",
+        "z": "auth-tab",
+        "name": "Fetch User (Mock)",
+        "func": "const bcryptjs = global.get(\"bcryptjs\");\nconst salt = bcryptjs.genSaltSync(10);\nmsg.dbUser = {\n  id: \"user123\",\n  email: msg.payload.email,\n  passwordHash: bcryptjs.hashSync(\"password123\", salt)\n};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 400,
+        "y": 300,
+        "wires": [
+            [
+                "login-compare"
+            ]
+        ]
+    },
+    {
+        "id": "login-compare",
+        "type": "function",
+        "z": "auth-tab",
+        "name": "Compare Password",
+        "func": "const bcryptjs = global.get(\"bcryptjs\");\n\nif (!msg.dbUser) {\n  msg.statusCode = 401;\n  msg.payload = { error: \"Invalid credentials\" };\n  return [null, msg];\n}\n\nconst passwordMatch = bcryptjs.compareSync(msg.payload.password, msg.dbUser.passwordHash);\n\nif (!passwordMatch) {\n  msg.statusCode = 401;\n  msg.payload = { error: \"Invalid credentials\" };\n  return [null, msg];\n}\n\nmsg.user = { id: msg.dbUser.id, email: msg.dbUser.email };\nreturn [msg, null];",
+        "outputs": 2,
+        "noerr": 0,
+        "x": 550,
+        "y": 300,
+        "wires": [
+            [
+                "login-jwt"
+            ],
+            [
+                "login-error"
+            ]
+        ],
+        "outputLabels": [
+            "match",
+            "invalid"
+        ]
+    },
+    {
+        "id": "login-jwt",
+        "type": "function",
+        "z": "auth-tab",
+        "name": "Generate JWT",
+        "func": "const jwt = global.get(\"jwt\");\nconst secret = process.env.JWT_SECRET || \"test-secret-key\";\nconst refreshSecret = process.env.JWT_REFRESH_SECRET || \"test-refresh-key\";\n\nconst accessToken = jwt.sign(\n  { id: msg.user.id, email: msg.user.email },\n  secret,\n  { expiresIn: \"1h\" }\n);\n\nconst refreshToken = jwt.sign(\n  { id: msg.user.id },\n  refreshSecret,\n  { expiresIn: \"7d\" }\n);\n\nmsg.statusCode = 200;\nmsg.payload = {\n  user: msg.user,\n  accessToken: accessToken,\n  refreshToken: refreshToken\n};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 700,
+        "y": 300,
+        "wires": [
+            [
+                "login-resp"
+            ]
+        ]
+    },
+    {
+        "id": "login-resp",
+        "type": "http response",
+        "z": "auth-tab",
+        "name": "Response",
+        "statusCode": "200",
+        "headers": {},
+        "x": 850,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "login-error",
+        "type": "http response",
+        "z": "auth-tab",
+        "name": "Error Response",
+        "statusCode": "401",
+        "headers": {},
+        "x": 550,
+        "y": 400,
+        "wires": []
+    }
+]

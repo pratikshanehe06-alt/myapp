@@ -26,3 +26,25 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     if user is None or not user.is_active:
         raise credentials_exception
     return user
+
+
+def get_current_tenant(current_user: User = Depends(get_current_user)) -> int:
+    if current_user.tenant_id is None:
+        raise HTTPException(status_code=400, detail="User is not assigned to a tenant")
+    return current_user.tenant_id
+
+
+def require_permission(permission_code: str):
+    def checker(current_user: User = Depends(get_current_user)) -> User:
+        user_permission_codes = {
+            perm.code
+            for role in current_user.roles
+            for perm in role.permissions
+        }
+        if permission_code not in user_permission_codes:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Missing required permission: {permission_code}",
+            )
+        return current_user
+    return checker

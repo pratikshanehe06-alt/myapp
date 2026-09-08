@@ -7,6 +7,13 @@ from alembic import context
 from app.database import Base
 from app.models.user import User
 from app.models.password_reset import PasswordResetToken
+from app.models.rbac import Role, Permission
+from app.modules.tenants.models import Tenant
+from app.modules.organization.models import Site, Area
+from app.modules.assets.models import Asset
+from app.modules.tags.models import Tag
+from app.modules.telemetry.models import TelemetryReading
+from app.modules.employees.models import Employee
 
 config = context.config
 

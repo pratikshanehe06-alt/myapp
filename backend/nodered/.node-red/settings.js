@@ -20,6 +20,8 @@
  *
  **/
 
+require('dotenv').config();
+
 module.exports = {
 
 /*******************************************************************************
@@ -41,7 +43,7 @@ module.exports = {
      * node-red from being able to decrypt your existing credentials and they will be
      * lost.
      */
-    //credentialSecret: "a-secret-key",
+    credentialSecret: process.env.NODE_RED_CREDENTIAL_SECRET || "local-development-credential-secret",
 
     /** By default, the flow JSON will be formatted over multiple lines making
      * it easier to compare changes when using version control.
@@ -198,10 +200,10 @@ module.exports = {
      * See https://github.com/troygoode/node-cors#configuration-options for
      * details on its contents. The following is a basic permissive set of options:
      */
-    //httpNodeCors: {
-    //    origin: "*",
-    //    methods: "GET,PUT,POST,DELETE"
-    //},
+    httpNodeCors: {
+        origin: "*",
+        methods: "GET,PUT,POST,DELETE"
+    },
 
     /** If you need to set an http proxy please set an environment variable
      * called http_proxy (or HTTP_PROXY) outside of Node-RED in the operating system.
@@ -439,7 +441,7 @@ module.exports = {
 
         projects: {
             /** To enable the Projects feature, set this value to true */
-            enabled: false,
+            enabled: true,
             workflow: {
                 /** Set the default projects workflow mode.
                  *  - manual - you must manually commit changes
@@ -546,7 +548,9 @@ module.exports = {
      *    global.get("os")
      */
     functionGlobalContext: {
-        // os:require('os'),
+        bcryptjs: require('bcryptjs'),
+        jwt: require('jsonwebtoken'),
+        dbPool: new (require('pg').Pool)({ connectionString: process.env.DATABASE_URL }),
     },
 
     /** The maximum number of messages nodes will buffer internally as part of their

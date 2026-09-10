@@ -22,24 +22,23 @@ export default function Login() {
   };
 
   return (
-    <div style={{ maxWidth: "360px", margin: "80px auto", fontFamily: "sans-serif" }}>
-      <h2>Sign In</h2>
-      <form onSubmit={handleSubmit}>
-        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required
-          style={{ width: "100%", padding: "0.5rem", marginBottom: "0.75rem" }} />
-        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required
-          style={{ width: "100%", padding: "0.5rem", marginBottom: "0.75rem" }} />
-        {error && <p style={{ color: "red", fontSize: "0.9rem" }}>{error}</p>}
-        <button type="submit" style={{ width: "100%", padding: "0.6rem", background: "#1a1a2e", color: "white", border: "none", borderRadius: "6px" }}>
-          Sign In
-        </button>
-      </form>
-      <p style={{ marginTop: "1rem", fontSize: "0.9rem" }}>
-        <Link to="/forgot-password">Forgot password?</Link>
-      </p>
-      <p style={{ fontSize: "0.9rem" }}>
-        No account? <Link to="/signup">Sign up</Link>
-      </p>
+    <div className="auth-page">
+      <div className="auth-card">
+        <div className="auth-brand">CoreOT</div>
+        <div className="auth-subtitle">Sign in to your account</div>
+        <form onSubmit={handleSubmit}>
+          <input className="auth-input" type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <input className="auth-input" type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+          {error && <p style={{ color: "var(--state-fault)", fontSize: "0.85rem", marginBottom: "0.75rem" }}>{error}</p>}
+          <button type="submit" className="auth-btn-primary">Sign In</button>
+        </form>
+        <p className="auth-footer-text">
+          <Link to="/forgot-password" className="auth-link">Forgot password?</Link>
+        </p>
+        <p className="auth-footer-text">
+          No account? <Link to="/signup" className="auth-link">Sign up</Link>
+        </p>
+      </div>
     </div>
   );
 }

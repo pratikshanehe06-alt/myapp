@@ -23,17 +23,17 @@ export default function ResetPassword() {
   };
 
   return (
-    <div style={{ maxWidth: "360px", margin: "80px auto", fontFamily: "sans-serif" }}>
-      <h2>Reset Password</h2>
-      <form onSubmit={handleSubmit}>
-        <input type="password" placeholder="New password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required
-          style={{ width: "100%", padding: "0.5rem", marginBottom: "0.75rem" }} />
-        {error && <p style={{ color: "red", fontSize: "0.9rem" }}>{error}</p>}
-        {success && <p style={{ color: "green", fontSize: "0.9rem" }}>Password reset! Redirecting to login...</p>}
-        <button type="submit" style={{ width: "100%", padding: "0.6rem", background: "#1a1a2e", color: "white", border: "none", borderRadius: "6px" }}>
-          Reset Password
-        </button>
-      </form>
+    <div className="auth-page">
+      <div className="auth-card">
+        <div className="auth-brand">CoreOT</div>
+        <div className="auth-subtitle">Set a new password</div>
+        <form onSubmit={handleSubmit}>
+          <input className="auth-input" type="password" placeholder="New password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
+          {error && <p style={{ color: "var(--state-fault)", fontSize: "0.85rem", marginBottom: "0.75rem" }}>{error}</p>}
+          {success && <p style={{ color: "var(--state-running)", fontSize: "0.85rem", marginBottom: "0.75rem" }}>Password reset! Redirecting...</p>}
+          <button type="submit" className="auth-btn-primary">Reset Password</button>
+        </form>
+      </div>
     </div>
   );
 }

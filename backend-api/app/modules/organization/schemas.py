@@ -7,6 +7,12 @@ class SiteCreateRequest(BaseModel):
     location: str | None = None
 
 
+class SiteUpdateRequest(BaseModel):
+    name: str | None = None
+    code: str | None = None
+    location: str | None = None
+
+
 class SiteResponse(BaseModel):
     id: int
     name: str
@@ -19,6 +25,11 @@ class SiteResponse(BaseModel):
 class AreaCreateRequest(BaseModel):
     site_id: int
     name: str
+    code: str | None = None
+
+
+class AreaUpdateRequest(BaseModel):
+    name: str | None = None
     code: str | None = None
 
 

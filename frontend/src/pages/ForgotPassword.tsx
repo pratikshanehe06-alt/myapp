@@ -13,19 +13,19 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div style={{ maxWidth: "360px", margin: "80px auto", fontFamily: "sans-serif" }}>
-      <h2>Forgot Password</h2>
-      <form onSubmit={handleSubmit}>
-        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required
-          style={{ width: "100%", padding: "0.5rem", marginBottom: "0.75rem" }} />
-        <button type="submit" style={{ width: "100%", padding: "0.6rem", background: "#1a1a2e", color: "white", border: "none", borderRadius: "6px" }}>
-          Send Reset Link
-        </button>
-      </form>
-      {message && <p style={{ marginTop: "1rem", fontSize: "0.9rem" }}>{message}</p>}
-      <p style={{ marginTop: "1rem", fontSize: "0.9rem" }}>
-        <Link to="/login">Back to sign in</Link>
-      </p>
+    <div className="auth-page">
+      <div className="auth-card">
+        <div className="auth-brand">CoreOT</div>
+        <div className="auth-subtitle">Reset your password</div>
+        <form onSubmit={handleSubmit}>
+          <input className="auth-input" type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <button type="submit" className="auth-btn-primary">Send Reset Link</button>
+        </form>
+        {message && <p style={{ fontSize: "0.85rem", color: "#6B7785", marginTop: "1rem" }}>{message}</p>}
+        <p className="auth-footer-text">
+          <Link to="/login" className="auth-link">Back to sign in</Link>
+        </p>
+      </div>
     </div>
   );
 }
